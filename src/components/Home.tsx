@@ -48,9 +48,10 @@ const Home = () => {
 
     } else {
       
-      axios.post('http://localhost:8000/api/fetchUploads', { email: email }, {
+      axios.post('https://krayo-be.vercel.app/api/fetchUploads', { email: email }, {
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
         }
       })
       .then((response) => {
@@ -117,8 +118,15 @@ const Home = () => {
         formData.append('fileName', file.name);
         formData.append("file", file);
 
-        axios.post('http://localhost:8000/api/uploadFile', formData)
+        // console.log("uploading");
+
+        axios.post('https://krayo-be.vercel.app/api/uploadFile', formData, {
+          headers: {
+            "Access-Control-Allow-Origin": "*"
+          }
+        })
         .then((response) => {
+          // console.log("saving", response);
           if (response.data.result) {
             setFile("");
             inputRef.current.value = null;
@@ -127,14 +135,15 @@ const Home = () => {
 
             // console.log(response.data.data)
             // Saving file
-            axios.post('http://localhost:8000/api/saveFile', {
+            axios.post('https://krayo-be.vercel.app/api/saveFile', {
               email: user.email,
               name: response.data.data.file.originalname,
               size: response.data.data.file.size,
               link: response.data.data.fileStream.Location
             }, {
               headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
               }
             })
             .then((uploadData) => {

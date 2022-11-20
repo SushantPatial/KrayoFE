@@ -10,7 +10,12 @@ const clientId = "917824582757-q2akd2q0n99o6b6m7iauaenj8bc6bdel.apps.googleuserc
 const GoogleSignin:React.FC = () => {
 
     const onSuccess = (res: any) => {
-        axios.post('http://localhost:8000/api/login', res)
+        axios.post('https://krayo-be.vercel.app/api/login', res, {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            }
+        })
         .then((result) => {
             localStorage.setItem('name', res.profileObj.givenName);
             localStorage.setItem('email', res.profileObj.email);
