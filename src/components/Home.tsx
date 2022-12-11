@@ -155,7 +155,7 @@ const Home:React.FC = () => {
     })
     .then((res) => {
       FileDownload(res.data, fileName.substring(14));
-      toast.success('File downloaded successfully!');
+      toast.success('Your download has started');
     })
     .catch((err) => {
       console.log(err);
