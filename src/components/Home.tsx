@@ -15,7 +15,7 @@ interface TableDataType {
   fileLink: any;
 }
 
-const Home = () => {
+const Home:React.FC = () => {
 
   const [userName, setUserName] = useState<string>("");
   const [file, setFile] = useState<any>();

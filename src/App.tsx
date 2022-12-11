@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const clientId = process.env.REACT_APP_CLIENT_ID as string; 
 
-function App() {
+const App:React.FC = () => {
 
   useEffect(() => {
     function start() {
@@ -53,7 +53,6 @@ function App() {
   }, [])
 
   
-
   return (
     <Router>
       <ToastContainer
