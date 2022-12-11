@@ -26,7 +26,7 @@ const GoogleSignin:React.FC = () => {
 
     const onFailure = (res: any) => {
         toast.error("Couldn't login. Try again later");
-        console.log('[Login Failed] res:', res);
+        console.log('Login Failed', res);
     }
 
     return (
