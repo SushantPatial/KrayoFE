@@ -10,8 +10,7 @@ const GoogleSignin:React.FC = () => {
     const onSuccess = (res: any) => {
         axios.post(process.env.REACT_APP_BACKEND_URL + '/api/login', res, {
             headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*"
+                "Content-Type": "application/json"
             }
         })
         .then((result) => {

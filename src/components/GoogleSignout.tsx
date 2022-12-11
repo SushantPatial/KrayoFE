@@ -11,7 +11,6 @@ const GoogleSignout:React.FC = () => {
         axios.post(process.env.REACT_APP_BACKEND_URL + '/api/logout', {}, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
                 "Authorization": `Bearer ${localStorage.getItem('token')}`
             }
         })

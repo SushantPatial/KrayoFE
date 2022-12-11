@@ -34,7 +34,6 @@ const App:React.FC = () => {
       axios.post(process.env.REACT_APP_BACKEND_URL + '/api/verify', {}, {
         headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
             "Authorization": `Bearer ${localStorage.getItem('token')}`
           }
         })

@@ -44,7 +44,6 @@ const Home:React.FC = () => {
     await axios.post(process.env.REACT_APP_BACKEND_URL + '/api/fetchUploads', {}, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
         "Authorization": `Bearer ${localStorage.getItem('token')}`
       }
     })
@@ -116,7 +115,6 @@ const Home:React.FC = () => {
   
           await axios.post(process.env.REACT_APP_BACKEND_URL + '/api/uploadFile', formData, {
             headers: {
-              "Access-Control-Allow-Origin": "*",
               "Authorization": `Bearer ${localStorage.getItem('token')}`
             }
           })
