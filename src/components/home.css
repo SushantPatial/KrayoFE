@@ -76,9 +76,6 @@
 .home .right .ant-table-wrapper {
     width: 40vw;
 }
-.home .right .ant-pagination {
-    display: none !important;
-}
 .home .right .file-link {
     display: flex;
     justify-content: center;

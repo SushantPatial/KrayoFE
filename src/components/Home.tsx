@@ -104,8 +104,8 @@ const Home:React.FC = () => {
   
       } else {
   
-        if (file.size > 3145728) { // 3145728 for production
-          toast.error("Please select a file lesser than 3 MB");
+        if (file.size > 10485760) { // 3145728 for production
+          toast.error("Please select a file lesser than 10 MB");
   
         } else {
           let formData = new FormData();
@@ -194,6 +194,7 @@ const Home:React.FC = () => {
               columns={columns}
               dataSource={data}
               size="small"
+              pagination={false} 
               scroll={{ y: 300 }}
             />
         }
