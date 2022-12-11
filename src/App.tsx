@@ -6,7 +6,6 @@ import { gapi } from 'gapi-script';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import { verify } from 'crypto';
 
 const clientId = process.env.REACT_APP_CLIENT_ID as string; 
 
@@ -78,6 +77,3 @@ function App() {
 }
 
 export default App;
-
-
-// React takes a lot of time to build the react-scripts. A walkaround for this will be to use esbuild (react-app-rewired-esbuild) which speeds up the development process. The problem is that it causes fast_refresh to fail. While these methods can be used to speed up the development process. It is not advisable to use them for production level.
