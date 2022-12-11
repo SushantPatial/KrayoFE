@@ -1,7 +1,6 @@
 import React from 'react';
-import './loader.css';
 
-const Loader = () => {
+const Loader: React.FC = () => {
   return (
     <div className="spinner-container">
       <div className="loader">

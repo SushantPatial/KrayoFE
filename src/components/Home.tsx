@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import GoogleSignout from './GoogleSignout';
-import './home.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Table } from 'antd';
