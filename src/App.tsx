@@ -5,8 +5,10 @@ import Home from './components/Home';
 import { gapi } from 'gapi-script';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import { verify } from 'crypto';
 
-const clientId = "917824582757-q2akd2q0n99o6b6m7iauaenj8bc6bdel.apps.googleusercontent.com";
+const clientId = process.env.REACT_APP_CLIENT_ID as string; 
 
 function App() {
 
@@ -20,11 +22,38 @@ function App() {
 
     gapi.load('client:auth2', start);
   }, [])
-
+  
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem("token") !== null;
   });
+
+  useEffect(() => {
+    if (localStorage.getItem('token') === null) {
+      setIsLoggedIn(false);
+    } else {
+      axios.post(process.env.REACT_APP_BACKEND_URL + '/api/verify', {}, {
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.data.result)
+            setIsLoggedIn(true);
+          else
+            setIsLoggedIn(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setIsLoggedIn(false);
+        });
+    }
+  }, [])
+
+  
 
   return (
     <Router>
@@ -49,3 +78,6 @@ function App() {
 }
 
 export default App;
+
+
+// React takes a lot of time to build the react-scripts. A walkaround for this will be to use esbuild (react-app-rewired-esbuild) which speeds up the development process. The problem is that it causes fast_refresh to fail. While these methods can be used to speed up the development process. It is not advisable to use them for production level.

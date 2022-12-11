@@ -13,6 +13,19 @@
   border-radius: 50%;
   animation: spinner 1.3s linear infinite;
 }
+.upload-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loader-small {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  border-top: 3px solid #308efa;
+  border-radius: 50%;
+  animation: spinner 1.3s linear infinite;
+}
 @keyframes spinner {
   0% {
     transform: rotate(0deg);

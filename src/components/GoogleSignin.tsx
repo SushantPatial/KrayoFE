@@ -1,16 +1,14 @@
 import React, { useState } from 'react'
 import { GoogleLogin } from 'react-google-login';
-import { gapi } from 'gapi-script';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const clientId = "917824582757-q2akd2q0n99o6b6m7iauaenj8bc6bdel.apps.googleusercontent.com"; // Store in .env
+const clientId = process.env.REACT_APP_CLIENT_ID as string; 
 
 const GoogleSignin:React.FC = () => {
 
     const onSuccess = (res: any) => {
-        axios.post('https://krayo-be.vercel.app/api/login', res, {
+        axios.post(process.env.REACT_APP_BACKEND_URL + '/api/login', res, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*"
@@ -18,7 +16,6 @@ const GoogleSignin:React.FC = () => {
         })
         .then((result) => {
             localStorage.setItem('name', res.profileObj.givenName);
-            localStorage.setItem('email', res.profileObj.email);
             localStorage.setItem('token', res.accessToken);
             window.location.href = '/';
         })

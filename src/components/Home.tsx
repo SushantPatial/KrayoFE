@@ -7,6 +7,7 @@ import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PaperClipOutlined } from '@ant-design/icons';
 import Loader from './Loader';
+const FileDownload = require('js-file-download');
 
 interface TableDataType {
   fileName: string;
@@ -16,16 +17,14 @@ interface TableDataType {
 
 const Home = () => {
 
-  const [user, setUser] = useState({
-    name: "",
-    email: ""
-  });
+  const [userName, setUserName] = useState<string>("");
   const [file, setFile] = useState<any>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<TableDataType[]>([]);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const inputRef: any = useRef(null);
 
-  const columns: ColumnsType<TableDataType> = [ {
+  const columns: ColumnsType<TableDataType> = [{
     title: 'Name',
     dataIndex: 'fileName'
   }, {
@@ -38,22 +37,17 @@ const Home = () => {
     width: '70px'
   }];
 
+  /* ===== Fetch Uploads function ===== */
   let fetchUploads = async () => {
     setLoading(true);
-    let email = localStorage.getItem('email');
 
-    if (email === null) {
-      toast.error("You are not logged in");
-      setLoading(false);
-
-    } else {
-      
-      axios.post('https://krayo-be.vercel.app/api/fetchUploads', { email: email }, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
-        }
-      })
+    await axios.post(process.env.REACT_APP_BACKEND_URL + '/api/fetchUploads', {}, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Authorization": `Bearer ${localStorage.getItem('token')}`
+      }
+    })
       .then((response) => {
         if (response.data.result) {
           let uploads = response.data.data;
@@ -63,9 +57,9 @@ const Home = () => {
             tempdata.push({
               fileName: upload.name,
               fileSize: upload.size + " MB",
-              fileLink: <a href={upload.link} className='file-link'> 
-                <PaperClipOutlined /> 
-              </a>
+              fileLink: <span className='file-link' onClick={() => downloadFile(upload.fileName)}>
+                <PaperClipOutlined />
+              </span>
             })
           })
 
@@ -80,112 +74,94 @@ const Home = () => {
         toast.error("Couldn't fetch uploaded files");
         setLoading(false);
       });
-    }
   }
 
+  /* ===== Setting states on load ===== */
   useEffect(() => {
     let name = localStorage.getItem('name');
-    let email = localStorage.getItem('email');
-    if (name != null && email != null) {
-      setUser({
-        name: name,
-        email: email
-      });
+    if (name != null) {
+      setUserName(name);
     } else {
       toast.error("You are not logged in");
     }
-      
+
     fetchUploads();
   }, []);
 
-  function handleChange(e: any) {
+  /* ===== Upload file input ===== */
+  let handleChange = (e: any) => {
     setFile(e.target.files[0])
   }
 
-  function handleSubmit(e :any) {
+  /* ===== Upload file button submit ===== */
+  let handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    if (!file) {
-      toast.warning("Please choose a file to upload");
+    if (!isUploading) {
+      setIsUploading(true);
 
-    } else {
-
-      if (file.size > 10000000) {
-        toast.error("Please select a file lesser than 10 MB");
-
+      if (!file) {
+        toast.warning("Please choose a file to upload");
+  
       } else {
-        let formData = new FormData();
-        formData.append('fileName', file.name);
-        formData.append("file", file);
-
-        // console.log("uploading");
-
-        axios.post('https://krayo-be.vercel.app/api/uploadFile', formData, {
-          headers: {
-            "Access-Control-Allow-Origin": "*"
-          }
-        })
-        .then((response) => {
-          // console.log("saving", response);
-          if (response.data.result) {
-            setFile("");
-            inputRef.current.value = null;
-
-            setLoading(true);
-
-            // console.log(response.data.data)
-            // Saving file
-            axios.post('https://krayo-be.vercel.app/api/saveFile', {
-              email: user.email,
-              name: response.data.data.file.originalname,
-              size: response.data.data.file.size,
-              link: response.data.data.fileStream.Location
-            }, {
-              headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*"
+  
+        if (file.size > 10485760) {
+          toast.error("Please select a file lesser than 10 MB");
+  
+        } else {
+          let formData = new FormData();
+          formData.append('fileName', file.name);
+          formData.append("file", file);
+  
+  
+          await axios.post(process.env.REACT_APP_BACKEND_URL + '/api/uploadFile', formData, {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Authorization": `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+            .then((response) => {
+  
+              console.log(response);
+  
+              if (response.data.result) {
+                setFile("");
+                inputRef.current.value = null;
+  
+                fetchUploads();
+  
+                toast.success('File uploaded successfully!');
               }
-            })
-            .then((uploadData) => {
-              if (uploadData.data.result) {
-                let uploads = uploadData.data.data;
-                const tempdata: TableDataType[] = [];
-      
-                uploads.forEach((upload: any) => {
-                  tempdata.push({
-                    fileName: upload.name,
-                    fileSize: upload.size + " MB",
-                    fileLink: <a href={upload.link} className='file-link'> 
-                      <PaperClipOutlined /> 
-                    </a>
-                  })
-                })
-                
-                setData(tempdata);
-              } else {
-                toast.error("You are not logged in");
-              }
-
-              setLoading(false);
             })
             .catch((err) => {
               console.log(err);
-              toast.error("Couldn't fetch uploaded files");
-              setLoading(false);
-            })
-            
-            toast.success('File uploaded successfully!');
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Couldn't upload file. Try again later");
-        });
+              toast.error("Couldn't upload file. Try again later");
+            });
+        }
       }
 
+      setIsUploading(false);
     }
   }
 
+  /* ===== Download file ===== */
+  let downloadFile = async (fileName: string) => {
+    await axios.get(process.env.REACT_APP_BACKEND_URL + '/api/downloadFile', { 
+      params: {
+        accessToken: localStorage.getItem('token'),
+        fileName: fileName
+      },
+      responseType: 'blob'
+    })
+    .then((res) => {
+      FileDownload(res.data, fileName.substring(14));
+      toast.success('File downloaded successfully!');
+    })
+    .catch((err) => {
+      console.log(err);
+      toast.error("Couldn't download file. Try again later");
+    })
+  }
 
   return (
     <div className='home'>
@@ -201,27 +177,27 @@ const Home = () => {
 
             <input id="file-input" type="file" ref={inputRef} onChange={handleChange} />
           </div>
-              
-          <button type="submit">Upload</button>
+
+          <button className='upload-btn' type="submit">
+            {isUploading ? <div className="loader-small"></div> : "Upload"}
+          </button>
         </form>
       </div>
 
       <div className="right">
         <GoogleSignout />
 
-        <h2>Welcome, {user.name}</h2>
+        <h2>Welcome, {userName}</h2>
         <h5>Here is the list of files you have uploaded</h5>
         {
-          loading ? 
-          <Loader /> : 
-          // data.length > 0 ?
-          <Table 
-            columns={columns} 
-            dataSource={data} 
-            size="small"
-            scroll={{ y: 300 }}
-          /> 
-          // "You do not have any uploads yet"
+          loading ?
+            <Loader /> :
+            <Table
+              columns={columns}
+              dataSource={data}
+              size="small"
+              scroll={{ y: 300 }}
+            />
         }
       </div>
     </div>
